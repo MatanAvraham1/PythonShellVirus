@@ -8,6 +8,10 @@ import WebCamSharing.sharer.sharer as wcSharer
 soc = None
 
 def connectToServer():
+    """
+    Connects to the server
+    """
+
     print("Connecting to host...")
 
     global soc
@@ -19,11 +23,25 @@ def connectToServer():
     print("Successfully connected!")
 
 def getCommand():
+    """
+    Receives the command from the server
+
+    return: the command
+    return type: str
+    """
+    
     command = soc.recv(1024).decode()
     print(f"Recv command! : {command}")
     return command
 
 def processCommand(command):
+    """
+    Processes and Executes the command
+
+    param 1: the command
+    param 1 type: str
+    """
+
     if command == WATCH_SCREEN_COMMAND:
         threading.Thread(target= handleScreenSharing).start()
         
@@ -38,6 +56,10 @@ def processCommand(command):
 
 
 def handleScreenSharing():
+    """
+    Executes the screen sharing command
+    """
+
     screenShareSoc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     screenShareSoc.connect((HOST_IP, HOST_PORT))
 
@@ -46,6 +68,10 @@ def handleScreenSharing():
     scSharer.shareScreen(screenShareSoc)
 
 def handleWebCameraSharing():
+    """
+    Executes the web camera sharing command
+    """
+
     screenShareSoc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     screenShareSoc.connect((HOST_IP, HOST_PORT))
 
