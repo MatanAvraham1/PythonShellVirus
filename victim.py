@@ -66,18 +66,22 @@ def handleScreenSharing():
     screenShareSoc.send(SCREEN_SHARE_CHANNEL.encode()) # Tell the server we want to use this socket connection as the screenShare channel
 
     scSharer.shareScreen(screenShareSoc)
+    # Closes the connection
+    screenShareSoc.close()
 
 def handleWebCameraSharing():
     """
     Executes the web camera sharing command
     """
 
-    screenShareSoc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    screenShareSoc.connect((HOST_IP, HOST_PORT))
+    webCamSoc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    webCamSoc.connect((HOST_IP, HOST_PORT))
 
-    screenShareSoc.send(WEB_CAM_SHARE_CHANNEL.encode()) # Tell the server we want to use this socket connection as the web camera sharing channel
+    webCamSoc.send(WEB_CAM_SHARE_CHANNEL.encode()) # Tell the server we want to use this socket connection as the web camera sharing channel
 
-    wcSharer.shareWebCam(screenShareSoc)
+    wcSharer.shareWebCam(webCamSoc)
+    # Closes the connection
+    webCamSoc.close()
 
 def main():
     connectToServer()

